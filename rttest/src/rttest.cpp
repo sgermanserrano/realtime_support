@@ -257,8 +257,10 @@ Rttest * get_rttest_thread_instance(pthread_t thread_id)
 {
   fprintf(stderr, "rttest: Check 5\n");
   if (rttest_instance_map.count(thread_id) == 0) {
+    fprintf(stderr, "rttest: Check 5.1\n");
     return NULL;
   }
+  fprintf(stderr, "rttest: Check 5.2\n");
   return &rttest_instance_map[thread_id];
 }
 

@@ -285,7 +285,7 @@ int Rttest::read_args(int argc, char ** argv)
   // -s,--sched-policy
   size_t sched_policy = SCHED_RR;
   // -m,--memory-size
-  size_t stack_size = 100 * 1024; //1024 * 1024;
+  size_t stack_size = 1024 * 1024; //1024 * 1024;
   // -f,--filename
   // Don't write a file unless filename specified
   char * filename = nullptr;
@@ -546,6 +546,7 @@ int rttest_get_next_rusage(size_t i)
 
 int rttest_spin(void *(*user_function)(void *), void * args)
 {
+  fprintf(stderr, "rttest: Check 20\n");
   auto thread_rttest_instance = get_rttest_thread_instance(pthread_self());
   if (!thread_rttest_instance) {
     return -1;
@@ -578,6 +579,8 @@ int rttest_spin_once(
 
 int Rttest::spin(void *(*user_function)(void *), void * args)
 {
+
+    fprintf(stderr, "rttest: Check 21\n");
   return rttest_spin_period(user_function, args, &this->params.update_period,
            this->params.iterations);
 }
@@ -586,6 +589,8 @@ int Rttest::spin_period(
   void *(*user_function)(void *), void * args,
   const struct timespec * update_period, const size_t iterations)
 {
+
+    fprintf(stderr, "rttest: Check 23\n");
   struct timespec start_time;
   clock_gettime(CLOCK_MONOTONIC, &start_time);
 
@@ -612,6 +617,8 @@ int Rttest::spin_once(
   void *(*user_function)(void *), void * args,
   const struct timespec * start_time, const size_t i)
 {
+
+    fprintf(stderr, "rttest: Check 23\n");
   return this->spin_once(user_function, args, start_time, &this->params.update_period, i);
 }
 
@@ -620,6 +627,8 @@ int Rttest::spin_once(
   const struct timespec * start_time,
   const struct timespec * update_period, const size_t i)
 {
+
+    //fprintf(stderr, "rttest: Check 24\n");
   if (!start_time || !update_period || (i > params.iterations && params.iterations > 0)) {
     return -1;
   }
@@ -648,6 +657,8 @@ int rttest_spin_period(
   void *(*user_function)(void *), void * args,
   const struct timespec * update_period, const size_t iterations)
 {
+
+    fprintf(stderr, "rttest: Check 22\n");
   auto thread_rttest_instance = get_rttest_thread_instance(pthread_self());
   if (!thread_rttest_instance) {
     return -1;
@@ -731,7 +742,7 @@ int Rttest::lock_and_prefault_dynamic()
 
   fprintf(stderr, "rttest: Check 15.1\n");
   struct rusage usage;
-  size_t page_size = sysconf(_SC_PAGESIZE);
+  size_t page_size = 2000;//sysconf(_SC_PAGESIZE);
   fprintf(stderr, "rttest: page size: %lu\n", page_size);
   getrusage(RUSAGE_SELF, &usage);
   std::vector<char *> prefaulter;

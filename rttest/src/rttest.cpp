@@ -742,8 +742,6 @@ int Rttest::lock_and_prefault_dynamic()
   // prefault until you see no more pagefaults
   while (encountered_minflts > 0 || encountered_majflts > 0) {
 
-    fprintf(stderr, "rttest: current_minflt %lu: \n", current_minflt);
-    fprintf(stderr, "rttest: current_majflt %lu: \n", current_majflt);
     char * ptr;
     try {
       ptr = new char[64 * page_size];
@@ -766,6 +764,8 @@ int Rttest::lock_and_prefault_dynamic()
     getrusage(RUSAGE_SELF, &usage);
     size_t current_minflt = usage.ru_minflt;
     size_t current_majflt = usage.ru_majflt;
+        fprintf(stderr, "rttest: current_minflt %lu: \n", current_minflt);
+        fprintf(stderr, "rttest: current_majflt %lu: \n", current_majflt);
     encountered_minflts = current_minflt - prev_minflts;
     encountered_majflts = current_majflt - prev_majflts;
     prev_minflts = current_minflt;

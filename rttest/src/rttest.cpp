@@ -721,7 +721,7 @@ int Rttest::lock_and_prefault_dynamic()
       munlockall();
       return -1;
     }
-    fprintf(stderr, "rttest: Check 15.2\n");
+
     prefaulter.push_back(ptr);
     getrusage(RUSAGE_SELF, &usage);
     size_t current_minflt = usage.ru_minflt;
@@ -732,7 +732,7 @@ int Rttest::lock_and_prefault_dynamic()
     prev_majflts = current_majflt;
   }
 
-  fprintf(stderr, "rttest: Check 15.3\n");
+  fprintf(stderr, "rttest: Check 15.2\n");
   for (auto & ptr : prefaulter) {
     delete[] ptr;
   }

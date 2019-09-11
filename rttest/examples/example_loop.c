@@ -26,7 +26,9 @@ void * my_loop_callback(void * args)
 
 int main(int argc, char ** argv)
 {
+  fprintf(stderr, "ex: Start prio set\n");
   rttest_set_sched_priority(98, SCHED_RR);
+  fprintf(stderr, "ex: Completed prio set\n");
 
   if (rttest_read_args(argc, argv) != 0) {
     perror("Couldn't read arguments for rttest");
@@ -36,12 +38,21 @@ int main(int argc, char ** argv)
     perror("Couldn't lock memory");
     return -1;
   }
+
+  fprintf(stderr, "ex: Start lock and prefault dynamic\n");
   rttest_lock_and_prefault_dynamic();
+  fprintf(stderr, "ex: Completed lock and prefault dynamic\n");
 
+  fprintf(stderr, "ex: Start callback\n");
   rttest_spin(my_loop_callback, NULL);
+  fprintf(stderr, "ex: Completed callback\n");
 
+  fprintf(stderr, "ex: Start results write\n");
   rttest_write_results();
+  fprintf(stderr, "ex: Completed results write\n");
+
   rttest_finish();
+  fprintf(stderr, "ex: Completed example\n");
 
   return 0;
 }

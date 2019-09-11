@@ -203,6 +203,7 @@ pthread_t initial_thread_id = 0;
 
 Rttest::Rttest()
 {
+  fprintf(stderr, "rttest: Check 1\n");
   memset(&this->results, 0, sizeof(struct rttest_results));
   this->results.min_latency = INT_MAX;
   this->results.max_latency = INT_MIN;
@@ -214,11 +215,13 @@ Rttest::~Rttest()
 // Functions
 void Rttest::set_params(struct rttest_params * params)
 {
+  fprintf(stderr, "rttest: Check 2\n");
   this->params = *params;
 }
 
 struct rttest_params * Rttest::get_params()
 {
+  fprintf(stderr, "rttest: Check 3\n");
   return &(this->params);
 }
 
@@ -226,6 +229,7 @@ int Rttest::record_jitter(
   const struct timespec * deadline,
   const struct timespec * result_time, const size_t iteration)
 {
+  //fprintf(stderr, "rttest: Check 4\n");
   size_t i = iteration;
   // Check if settings authorize buffer recording
   if (this->params.iterations == 0) {
@@ -251,6 +255,7 @@ int Rttest::record_jitter(
 
 Rttest * get_rttest_thread_instance(pthread_t thread_id)
 {
+  fprintf(stderr, "rttest: Check 5\n");
   if (rttest_instance_map.count(thread_id) == 0) {
     return NULL;
   }
@@ -259,6 +264,7 @@ Rttest * get_rttest_thread_instance(pthread_t thread_id)
 
 int Rttest::read_args(int argc, char ** argv)
 {
+  fprintf(stderr, "rttest: Check 6\n");
   // -i,--iterations
   size_t iterations = 1000;
   // -u,--update-period
@@ -373,6 +379,7 @@ int Rttest::read_args(int argc, char ** argv)
 
 int rttest_get_params(struct rttest_params * params_in)
 {
+  fprintf(stderr, "rttest: Check 7\n");
   auto thread_rttest_instance = get_rttest_thread_instance(pthread_self());
 
   if (!thread_rttest_instance) {
@@ -390,6 +397,7 @@ int rttest_get_params(struct rttest_params * params_in)
 
 int rttest_init_new_thread()
 {
+  fprintf(stderr, "rttest: Check 8\n");
   auto thread_id = pthread_self();
   auto thread_rttest_instance = get_rttest_thread_instance(thread_id);
   if (thread_rttest_instance == nullptr) {
@@ -410,6 +418,7 @@ int rttest_init_new_thread()
 
 int rttest_read_args(int argc, char ** argv)
 {
+  fprintf(stderr, "rttest: Check 9\n");
   auto thread_id = pthread_self();
   auto thread_rttest_instance = get_rttest_thread_instance(thread_id);
   if (!thread_rttest_instance) {
@@ -428,6 +437,7 @@ int Rttest::init(
   size_t sched_policy, int sched_priority, size_t stack_size,
   char * filename)
 {
+  fprintf(stderr, "rttest: Check 10\n");
   this->params.iterations = iterations;
   this->params.update_period = update_period;
   this->params.sched_policy = sched_policy;
@@ -455,6 +465,7 @@ int Rttest::init(
 
 void Rttest::initialize_dynamic_memory()
 {
+  fprintf(stderr, "rttest: Check 11\n");
   size_t iterations = this->params.iterations;
   if (iterations == 0) {
     // Allocate a sample buffer of size 1
@@ -468,6 +479,7 @@ int rttest_init(
   size_t sched_policy, int sched_priority, size_t stack_size,
   char * filename)
 {
+  fprintf(stderr, "rttest: Check 12\n");
   auto thread_id = pthread_self();
   auto thread_rttest_instance = get_rttest_thread_instance(thread_id);
   if (thread_rttest_instance == nullptr) {
@@ -486,6 +498,7 @@ int rttest_init(
 
 int Rttest::get_next_rusage(size_t i)
 {
+  //fprintf(stderr, "rttest: Check 13\n");
   size_t prev_maj_pagefaults = this->prev_usage.ru_majflt;
   size_t prev_min_pagefaults = this->prev_usage.ru_minflt;
   if (getrusage(RUSAGE_THREAD, &this->prev_usage) != 0) {
@@ -505,6 +518,7 @@ int Rttest::get_next_rusage(size_t i)
 
 int rttest_get_next_rusage(size_t i)
 {
+  fprintf(stderr, "rttest: Check 14\n");
   auto thread_rttest_instance = get_rttest_thread_instance(pthread_self());
   if (!thread_rttest_instance) {
     return -1;
@@ -639,10 +653,17 @@ int Rttest::lock_memory()
 
 int rttest_lock_and_prefault_dynamic()
 {
+
+  fprintf(stderr, "rttest: Start lock and prefault\n");
   auto thread_rttest_instance = get_rttest_thread_instance(pthread_self());
+  fprintf(stderr, "rttest: Got thread instance\n");
   if (!thread_rttest_instance) {
+
+    fprintf(stderr, "rttest: Thread instance error\n");
     return -1;
   }
+
+  fprintf(stderr, "rttest: Return thread instance\n");
   return thread_rttest_instance->lock_and_prefault_dynamic();
 }
 
@@ -743,6 +764,7 @@ int rttest_set_sched_priority(size_t sched_priority, int policy)
 
   param.sched_priority = sched_priority;
 
+    fprintf(stderr, "rttest: Sched prio set\n");
   // note that sched_setscheduler can set the priority of an arbitrary process
   return sched_setscheduler(0, policy, &param);
 }

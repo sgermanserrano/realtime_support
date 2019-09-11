@@ -742,8 +742,8 @@ int Rttest::lock_and_prefault_dynamic()
   // prefault until you see no more pagefaults
   while (encountered_minflts > 0 || encountered_majflts > 0) {
 
-    //fprintf(stderr, "rttest: encountered_minflts %lu: \n", encountered_minflts);
-    //fprintf(stderr, "rttest: encountered_majflts %lu: \n", encountered_majflts);
+    fprintf(stderr, "rttest: current_minflt %lu: \n", current_minflt);
+    fprintf(stderr, "rttest: current_majflt %lu: \n", current_majflt);
     char * ptr;
     try {
       ptr = new char[64 * page_size];

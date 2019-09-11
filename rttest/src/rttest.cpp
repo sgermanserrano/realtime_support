@@ -749,6 +749,7 @@ int Rttest::lock_and_prefault_dynamic()
       ptr = new char[64 * page_size];
       memset(ptr, 0, 64 * page_size);
     } catch (std::bad_alloc & e) {
+      fprintf(stderr, "rttest: ERROR \n");
       fprintf(stderr, "Caught exception: %s\n", e.what());
       fprintf(stderr, "Unlocking memory and continuing.\n");
       for (auto & ptr : prefaulter) {

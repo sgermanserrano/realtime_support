@@ -422,6 +422,7 @@ int rttest_read_args(int argc, char ** argv)
   auto thread_id = pthread_self();
   auto thread_rttest_instance = get_rttest_thread_instance(thread_id);
   if (!thread_rttest_instance) {
+    fprintf(stderr, "rttest: New Rttest\n");
     // Create the new Rttest instance for this thread
     rttest_instance_map.emplace(std::make_pair(thread_id, Rttest()));
     if (rttest_instance_map.size() == 1 && initial_thread_id == 0) {

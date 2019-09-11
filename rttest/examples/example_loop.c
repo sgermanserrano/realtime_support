@@ -26,14 +26,17 @@ void * my_loop_callback(void * args)
 
 int main(int argc, char ** argv)
 {
+//fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
   fprintf(stderr, "ex: Start prio set\n");
   rttest_set_sched_priority(98, SCHED_RR);
   fprintf(stderr, "ex: Completed prio set\n");
 
+  fprintf(stderr, "ex: read rttest args\n");
   if (rttest_read_args(argc, argv) != 0) {
     perror("Couldn't read arguments for rttest");
     return -1;
   }
+  fprintf(stderr, "ex: lock memory\n");
   if (rttest_lock_memory() != 0) {
     perror("Couldn't lock memory");
     return -1;

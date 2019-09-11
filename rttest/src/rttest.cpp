@@ -57,6 +57,7 @@ public:
   {
     if (new_buffer_size > 0) {
       resize(0);
+      //fprintf(stderr, "rttest: new_buffer_size: %lu\n", new_buffer_size*sizeof(int));
       this->buffer_size = new_buffer_size;
       this->latency_samples = static_cast<int *>(
         std::malloc(new_buffer_size * sizeof(int)));
@@ -204,6 +205,10 @@ pthread_t initial_thread_id = 0;
 Rttest::Rttest()
 {
   fprintf(stderr, "rttest: Check 1\n");
+  fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
+  pthread_attr_t attr;
+  pthread_attr_init(&attr);
+  pthread_attr_setstacksize(&attr, 1);
   memset(&this->results, 0, sizeof(struct rttest_results));
   this->results.min_latency = INT_MAX;
   this->results.max_latency = INT_MIN;
@@ -256,6 +261,7 @@ int Rttest::record_jitter(
 Rttest * get_rttest_thread_instance(pthread_t thread_id)
 {
   fprintf(stderr, "rttest: Check 5\n");
+  fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
   if (rttest_instance_map.count(thread_id) == 0) {
     fprintf(stderr, "rttest: Check 5.1\n");
     return NULL;
@@ -267,6 +273,7 @@ Rttest * get_rttest_thread_instance(pthread_t thread_id)
 int Rttest::read_args(int argc, char ** argv)
 {
   fprintf(stderr, "rttest: Check 6\n");
+  fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
   // -i,--iterations
   size_t iterations = 1000;
   // -u,--update-period
@@ -278,7 +285,7 @@ int Rttest::read_args(int argc, char ** argv)
   // -s,--sched-policy
   size_t sched_policy = SCHED_RR;
   // -m,--memory-size
-  size_t stack_size = 1024 * 1024;
+  size_t stack_size = 100 * 1024; //1024 * 1024;
   // -f,--filename
   // Don't write a file unless filename specified
   char * filename = nullptr;
@@ -421,6 +428,7 @@ int rttest_init_new_thread()
 int rttest_read_args(int argc, char ** argv)
 {
   fprintf(stderr, "rttest: Check 9\n");
+  fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
   auto thread_id = pthread_self();
   auto thread_rttest_instance = get_rttest_thread_instance(thread_id);
   if (!thread_rttest_instance) {
@@ -441,6 +449,12 @@ int Rttest::init(
   char * filename)
 {
   fprintf(stderr, "rttest: Check 10\n");
+  fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
+  //fprintf(stderr, "rttest: stack_size: %lu\n", stack_size);
+  //fprintf(stderr, "rttest: iterations: %lu\n", iterations);
+  pthread_attr_t attr;
+  pthread_attr_init(&attr);
+  pthread_attr_setstacksize(&attr, 1);
   this->params.iterations = iterations;
   this->params.update_period = update_period;
   this->params.sched_policy = sched_policy;
@@ -469,6 +483,7 @@ int Rttest::init(
 void Rttest::initialize_dynamic_memory()
 {
   fprintf(stderr, "rttest: Check 11\n");
+  fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
   size_t iterations = this->params.iterations;
   if (iterations == 0) {
     // Allocate a sample buffer of size 1
@@ -642,7 +657,24 @@ int rttest_spin_period(
 
 int rttest_lock_memory()
 {
+  fprintf(stderr, "rttest: Check 16\n");
+  fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
   auto thread_rttest_instance = get_rttest_thread_instance(pthread_self());
+  /*fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
+
+  pthread_id_np_t   tid;
+  tid = pthread_getthreadid_np();
+
+        int s, i;
+       size_t v;
+       void *stkaddr;
+       struct sched_param sp;
+       s = pthread_attr_getstack(tid.attr, &stkaddr, &v);
+       if (s != 0){
+           handle_error_en(s, "pthread_attr_getstack");
+       printf("%sStack address       = %p\n", prefix, stkaddr);
+       printf("%sStack size          = 0x%x bytes\n", prefix, v);}
+*/
   if (!thread_rttest_instance) {
     return -1;
   }
@@ -651,6 +683,8 @@ int rttest_lock_memory()
 
 int Rttest::lock_memory()
 {
+  fprintf(stderr, "rttest: Check 17\n");
+  fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
   return mlockall(MCL_CURRENT | MCL_FUTURE);
 }
 
@@ -673,6 +707,7 @@ int rttest_lock_and_prefault_dynamic()
 int Rttest::lock_and_prefault_dynamic()
 {
   fprintf(stderr, "rttest: Check 15\n");
+  fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
   fprintf(stderr, "rttest: Start Rttest::lock and prefault\n");
   if (mlockall(MCL_CURRENT | MCL_FUTURE) != 0) {
     perror("mlockall failed");
@@ -707,8 +742,8 @@ int Rttest::lock_and_prefault_dynamic()
   // prefault until you see no more pagefaults
   while (encountered_minflts > 0 || encountered_majflts > 0) {
 
-    fprintf(stderr, "rttest: encountered_minflts %lu: \n", encountered_minflts);
-    fprintf(stderr, "rttest: encountered_majflts %lu: \n", encountered_majflts);
+    //fprintf(stderr, "rttest: encountered_minflts %lu: \n", encountered_minflts);
+    //fprintf(stderr, "rttest: encountered_majflts %lu: \n", encountered_majflts);
     char * ptr;
     try {
       ptr = new char[64 * page_size];
@@ -745,6 +780,7 @@ int Rttest::lock_and_prefault_dynamic()
 
 int rttest_prefault_stack_size(const size_t stack_size)
 {
+  fprintf(stderr, "rttest: Check 18\n");
   unsigned char stack[stack_size];
   memset(stack, 0, stack_size);
   return 0;
@@ -752,6 +788,7 @@ int rttest_prefault_stack_size(const size_t stack_size)
 
 int rttest_prefault_stack()
 {
+  fprintf(stderr, "rttest: Check 19\n");
   auto thread_rttest_instance = get_rttest_thread_instance(pthread_self());
   if (!thread_rttest_instance) {
     return -1;
@@ -761,6 +798,7 @@ int rttest_prefault_stack()
 
 int rttest_set_thread_default_priority()
 {
+  fprintf(stderr, "rttest: rttest_set_thread_default_priority\n");
   auto thread_rttest_instance = get_rttest_thread_instance(pthread_self());
   if (!thread_rttest_instance) {
     return -1;
@@ -772,6 +810,7 @@ int rttest_set_thread_default_priority()
 
 int rttest_set_sched_priority(size_t sched_priority, int policy)
 {
+fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
   struct sched_param param;
 
   param.sched_priority = sched_priority;

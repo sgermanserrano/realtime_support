@@ -260,13 +260,13 @@ int Rttest::record_jitter(
 
 Rttest * get_rttest_thread_instance(pthread_t thread_id)
 {
-  fprintf(stderr, "rttest: Check 5\n");
-  fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
+  //fprintf(stderr, "rttest: Check 5\n");
+  //fprintf(stderr, "rttest: Thread id %lu\n", pthread_self());
   if (rttest_instance_map.count(thread_id) == 0) {
     fprintf(stderr, "rttest: Check 5.1\n");
     return NULL;
   }
-  fprintf(stderr, "rttest: Check 5.2\n");
+  //fprintf(stderr, "rttest: Check 5.2\n");
   return &rttest_instance_map[thread_id];
 }
 
@@ -742,12 +742,15 @@ int Rttest::lock_and_prefault_dynamic()
 
   fprintf(stderr, "rttest: Check 15.1\n");
   struct rusage usage;
-  size_t page_size = 2000;//sysconf(_SC_PAGESIZE);
+  size_t page_size = 3000; //sysconf(_SC_PAGESIZE); //TODO
   fprintf(stderr, "rttest: page size: %lu\n", page_size);
   getrusage(RUSAGE_SELF, &usage);
   std::vector<char *> prefaulter;
   size_t prev_minflts = usage.ru_minflt;
   size_t prev_majflts = usage.ru_majflt;
+
+  fprintf(stderr, "rttest: Initial minflts %lu: \n", prev_minflts);
+  fprintf(stderr, "rttest: Initial majflts %lu: \n", prev_majflts);
   size_t encountered_minflts = 1;
   size_t encountered_majflts = 1;
   // prefault until you see no more pagefaults
@@ -775,8 +778,6 @@ int Rttest::lock_and_prefault_dynamic()
     getrusage(RUSAGE_SELF, &usage);
     size_t current_minflt = usage.ru_minflt;
     size_t current_majflt = usage.ru_majflt;
-        fprintf(stderr, "rttest: current_minflt %lu: \n", current_minflt);
-        fprintf(stderr, "rttest: current_majflt %lu: \n", current_majflt);
     encountered_minflts = current_minflt - prev_minflts;
     encountered_majflts = current_majflt - prev_majflts;
     prev_minflts = current_minflt;

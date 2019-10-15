@@ -742,7 +742,7 @@ int Rttest::lock_and_prefault_dynamic()
 
   fprintf(stderr, "rttest: Check 15.1\n");
   struct rusage usage;
-  size_t page_size = 3000; //sysconf(_SC_PAGESIZE); //TODO
+  size_t page_size = 2000; //sysconf(_SC_PAGESIZE); //TODO
   fprintf(stderr, "rttest: page size: %lu\n", page_size);
   getrusage(RUSAGE_SELF, &usage);
   std::vector<char *> prefaulter;
@@ -780,6 +780,8 @@ int Rttest::lock_and_prefault_dynamic()
     size_t current_majflt = usage.ru_majflt;
     encountered_minflts = current_minflt - prev_minflts;
     encountered_majflts = current_majflt - prev_majflts;
+    fprintf(stderr, "rttest: encountered_minflts %lu: \n", encountered_minflts);
+    fprintf(stderr, "rttest: encountered_majflts %lu: \n", encountered_majflts);
     prev_minflts = current_minflt;
     prev_majflts = current_majflt;
   }

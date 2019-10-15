@@ -680,8 +680,8 @@ int Rttest::lock_and_prefault_dynamic()
   while (encountered_minflts > 0 || encountered_majflts > 0) {
     char * ptr;
     try {
-      ptr = new char[64 * page_size];
-      memset(ptr, 0, 64 * page_size);
+      ptr = new char[32 * page_size]; //Allocate smaller buffer to fit Hikey970 memory
+      memset(ptr, 0, 32 * page_size);
     } catch (std::bad_alloc & e) {
       fprintf(stderr, "Caught exception: %s\n", e.what());
       fprintf(stderr, "Unlocking memory and continuing.\n");
